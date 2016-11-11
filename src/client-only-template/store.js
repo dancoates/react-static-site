@@ -1,0 +1,19 @@
+import thunk from 'redux-thunk';
+import reducers from 'client-only-template/reducers';
+import {compose, createStore, applyMiddleware} from 'redux';
+
+// create middleware
+var middleware = applyMiddleware(
+    thunk
+);
+
+const composeEnhancers = (
+    process.env.NODE_ENV !== 'production' &&
+    typeof window === 'object' &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+) || compose;
+
+const store = createStore(reducers, {}, composeEnhancers(middleware));
+
+// create and export the store
+export default store;

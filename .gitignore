@@ -1,0 +1,8 @@
+dist
+.env
+.DS_STORE
+.DS_Store
+node_modules
+
+**/.idea/workspace.xml
+**/.idea/tasks.xml
