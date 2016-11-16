@@ -21,7 +21,6 @@ module.exports = (locals, callback) => {
         .filter(key => locals.assets[key].match(/\.js$/) && !key.match(/^__/))
         .map(key => locals.assets[key]);
 
-    console.log(css, scripts);
 
     match({routes, location}, (error, redirectLocation, renderProps) => {
         if(!error) {

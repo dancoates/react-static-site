@@ -10,8 +10,6 @@ var routes = (
     <Route component={routeHandlers.AppHandler} path="/">
         <IndexRoute component={routeHandlers.MainPage} />
         <Route path="other" component={routeHandlers.OtherPage} />
-        <Route path="cards" component={routeHandlers.OtherPage} />
-        <Route path="asfdasdf" component={routeHandlers.OtherPage} />
         <Route path="*" component={routeHandlers.ErrorHandler}/>
     </Route>
 );

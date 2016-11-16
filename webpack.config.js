@@ -10,11 +10,16 @@ const pkg = require('./package');
 const proxyquire = require('proxyquire').noCallThru();
 const reactRouterToArray = require('react-router-to-array');
 
+// Check if watching so that prerendering can be disabled.
+const watching = process.argv[1] && process.argv[1].indexOf('webpack-dev-server') !== -1;
 
-// Stub route handlers, we just need the route paths
-const routes = proxyquire('./src/client-only-template/routes', {'./routeHandlers': {}});
-// Get paths from routes
-const paths = reactRouterToArray(routes);
+let paths = ['/'];
+if(process.env.NODE_ENV === 'production') {
+    // Stub route handlers, we just need the route paths
+    const routes = proxyquire('./src/client-only-template/routes', {'./routeHandlers': {}});
+    // Get paths from routes
+    paths = reactRouterToArray(routes);
+}
 
 /**
  *
@@ -48,15 +53,15 @@ const FILE_LOADER = {
 
 const development = {
     devtool: 'source-map',
-    entry: {
-        __prerender: './src/client-only-template/prerender.js',
+    entry: Object.assign({}, {
         [pkg.name]: './src/client-only-template/client.js'
-    },
+    }, watching ? {} : { // Don't have prerender entry if watching
+        __prerender: './src/client-only-template/prerender.js',
+    }),
     output: {
         path: './dist',
-        filename: '[name]-[hash].js',
+        filename: '[name].js',
         publicPath: '/',
-        library: 'app',
         libraryTarget: 'commonjs2'
     },
     resolve: {
@@ -67,8 +72,9 @@ const development = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || "development")
         }),
-        new StaticSiteGeneratorPlugin('__prerender', paths)
-    ],
+        // Don't run prerender if watching
+        (watching ? null : new StaticSiteGeneratorPlugin('__prerender', paths))
+    ].filter(plugin => !!plugin),
     module: {
         loaders: [
             JS_LOADER,
@@ -96,6 +102,9 @@ const development = {
 const production = Object.assign({}, development, {
     devtool: undefined,
     cache: false,
+    output: Object.assign({}, development.output, {
+        filename: '[name]-[hash].js'
+    }),
     plugins: [
         new ExtractTextPlugin('client-only-template-[contenthash].css'),
         new webpack.optimize.UglifyJsPlugin(),
