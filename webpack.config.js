@@ -13,8 +13,6 @@ const reactRouterToArray = require('react-router-to-array');
 
 // Stub route handlers, we just need the route paths
 const routes = proxyquire('./src/client-only-template/routes', {'./routeHandlers': {}});
-// Determine whether this is a prerender build or not
-const prerendering = process.argv[2] === '--prerender';
 // Get paths from routes
 const paths = reactRouterToArray(routes);
 
@@ -50,19 +48,17 @@ const FILE_LOADER = {
 
 const development = {
     devtool: 'source-map',
-    entry: prerendering ? ({
-        __prerender: './src/client-only-template/prerender.js'
-    }) : ({
+    entry: {
+        __prerender: './src/client-only-template/prerender.js',
         [pkg.name]: './src/client-only-template/client.js'
-    }),
-    output: Object.assign({}, {
+    },
+    output: {
         path: './dist',
-        filename: '[name].js',// @TODO add hashing
-        publicPath: '/'
-    }, (prerendering ? { // settings required for prerender to work
-        library: true,
+        filename: '[name]-[hash].js',
+        publicPath: '/',
+        library: 'app',
         libraryTarget: 'commonjs2'
-    } : {})),
+    },
     resolve: {
         extensions: ['', '.jsx', '.js'],
         modulesDirectories: ['src', 'node_modules']
@@ -70,8 +66,9 @@ const development = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || "development")
-        })
-    ].concat(prerendering ? new StaticSiteGeneratorPlugin('__prerender', paths) : []),
+        }),
+        new StaticSiteGeneratorPlugin('__prerender', paths)
+    ],
     module: {
         loaders: [
             JS_LOADER,
@@ -99,12 +96,12 @@ const development = {
 const production = Object.assign({}, development, {
     devtool: undefined,
     cache: false,
-    plugins: development.plugins.concat([
-        new ExtractTextPlugin('style.css'),
+    plugins: [
+        new ExtractTextPlugin('client-only-template-[contenthash].css'),
         new webpack.optimize.UglifyJsPlugin(),
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.optimize.DedupePlugin()
-    ]),
+    ].concat(development.plugins),
     module: {
         loaders: [
             JS_LOADER,

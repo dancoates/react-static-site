@@ -9,11 +9,18 @@ export default (props) => {
             <title>client-only-templates</title>
             <meta name="description" content=""/>
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <link rel="stylesheet" href="/style.css"/>
+            {props.css && props.css.map(file => <link rel="stylesheet" href={file}/>)}
         </head>
         <body>
             <div id="client-only-template" dangerouslySetInnerHTML={{__html: props.content}}></div>
-            <script type="text/javascript" src="/client-only-template.js"></script>
+
+            {/* 
+                for prerendering to work webpack needs to build with libraryTarget set to commonjs2.
+                So the below line is required to avoid errors when the bundle sets module.exports
+            */}
+            <script dangerouslySetInnerHTML={{__html: 'window.module = {};'}}/>
+            {props.scripts && props.scripts.map(file => <script src={file}/>)}
+            
         </body>
     </html>;
 }
