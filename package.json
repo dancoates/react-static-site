@@ -5,11 +5,17 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "ava": "ava",
     "build": "rm -rf ./dist/* && NODE_ENV=production webpack",
     "build-dev": "rm -rf ./dist/* && NODE_ENV=development webpack",
-    "watch": "NODE_ENV=development webpack-dev-server --content-base dist/ --inline --hot",
+    "check-coverage": "nyc check-coverage --branches 0.0  --functions 0.0 --lines 0",
     "docs": "jsdoc -c jsdoc-config.json",
-    "lint": "eslint -c .eslintrc src/**"
+    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "lint": "eslint src/**/*.jsx src/**/*.js",
+    "lint-fix": "eslint src/**/*.jsx src/**/*.js --fix",
+    "test": "nyc --report-dir=./coverage ava && yarn run check-coverage",
+    "test-all": "yarn run lint && yarn run flow && yarn run test",
+    "watch": "NODE_ENV=development webpack-dev-server --content-base dist/ --inline --hot"
   },
   "dependencies": {
     "bruce": "^0.6.0",
@@ -40,7 +46,9 @@
     "eslint-config-blueflag": "^0.2.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
+    "flow-bin": "^0.35.0",
     "jsdoc": "^3.4.3",
+    "jsdoc-babel": "^0.2.1",
     "jsdonk": "^0.2.1",
     "json-loader": "^0.5.4",
     "node-sass": "^3.11.2",

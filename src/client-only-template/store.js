@@ -7,6 +7,7 @@ var middleware = applyMiddleware(
     thunk
 );
 
+// hook up redux devtool
 const composeEnhancers = (
     process.env.NODE_ENV !== 'production' &&
     typeof window === 'object' &&

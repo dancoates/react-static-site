@@ -1,7 +1,12 @@
 import React from 'react';
 
+type IndexProps = {
+    css: String[],
+    scripts: String[],
+    content: String
+}
 
-export default (props) => {
+export default function index(props: IndexProps): React.Element<any> {
     return <html lang="">
         <head>
             <meta charSet="utf-8"/>

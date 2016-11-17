@@ -107,7 +107,11 @@ const production = Object.assign({}, development, {
     }),
     plugins: [
         new ExtractTextPlugin('client-only-template-[contenthash].css'),
-        new webpack.optimize.UglifyJsPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        }),
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.optimize.DedupePlugin()
     ].concat(development.plugins),
