@@ -1,5 +1,10 @@
 {
-    "presets": [
-        "blueflag"
-    ]
+    "presets": ["blueflag"],
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    }
 }

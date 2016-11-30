@@ -5,16 +5,16 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "ava": "ava",
+    "ava": "NODE_ENV=test ava",
     "build": "rm -rf ./dist/* && NODE_ENV=production webpack",
     "build-dev": "rm -rf ./dist/* && NODE_ENV=development webpack",
-    "check-coverage": "nyc check-coverage --branches 0.0  --functions 0.0 --lines 0",
+    "check-coverage": "nyc check-coverage --branches 100  --functions 100 --lines 100",
     "docs": "jsdoc -c jsdoc-config.json",
-    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "flow": "flow check",
     "lint": "eslint src/**/*.jsx src/**/*.js",
     "lint-fix": "eslint src/**/*.jsx src/**/*.js --fix",
-    "test": "nyc --report-dir=./coverage ava && yarn run check-coverage",
-    "test-all": "yarn run lint && yarn run flow && yarn run test",
+    "test": "NODE_ENV=test nyc --report-dir=./coverage ava && yarn run check-coverage",
+    "test-all": "NODE_ENV=test yarn run lint && yarn run flow && yarn run test",
     "watch": "NODE_ENV=development webpack-dev-server --content-base dist/ --inline --hot"
   },
   "dependencies": {
@@ -33,9 +33,10 @@
   },
   "devDependencies": {
     "autoprefixer": "^6.5.2",
-    "ava": "^0.16.0",
+    "ava": "^0.17.0",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.7",
+    "babel-plugin-istanbul": "^3.0.0",
     "babel-plugin-react-transform": "^2.0.2",
     "babel-preset-blueflag": "^0.0.1",
     "babel-register": "^6.18.0",
@@ -52,7 +53,7 @@
     "jsdonk": "^0.2.1",
     "json-loader": "^0.5.4",
     "node-sass": "^3.11.2",
-    "nyc": "^8.4.0",
+    "nyc": "^10.0.0",
     "postcss": "^5.2.5",
     "postcss-loader": "^1.1.0",
     "proxyquire": "^1.7.10",
@@ -68,13 +69,23 @@
   },
   "ava": {
     "require": "babel-register",
-    "babel": "inherit",
+    "babel": {
+      "presets": [
+        "blueflag"
+      ],
+      "plugins": [
+        "istanbul"
+      ],
+      "sourceMaps": "inline"
+    },
     "files": [
       "src/**/*-test.js"
     ]
   },
   "nyc": {
     "all": true,
+    "sourceMap": false,
+    "instrument": false,
     "include": [
       "src/**"
     ],
@@ -83,7 +94,7 @@
     ],
     "reporter": [
       "lcov",
-      "text-summary"
+      "text"
     ],
     "extension": [
       ".js",
